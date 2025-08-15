@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="row mb-3">
+  <div class="col-md-4">
+    <div class="card summary-card shadow-sm p-3">
+      <h6 class="text-muted">Total expenses</h6>
+      <h2 class="fw-bold">₹ {{ '%.2f'|format(total) }}</h2>
+      <p class="small text-muted">Keep going — track every expense.</p>
+    </div>
+
+    <div class="card mt-3 shadow-sm p-3">
+      <h6 class="mb-2">Add an expense</h6>
+      <form method="POST">
+        <input name="title" class="form-control mb-2 custom-input" placeholder="Title (e.g., Coffee)" required>
+        <div class="d-flex gap-2 mb-2">
+          <input name="amount" class="form-control custom-input" placeholder="Amount" required>
+          <input name="date" type="date" class="form-control custom-input" value="{{ ('' ) }}" >
+        </div>
+        <input name="category" class="form-control mb-2 custom-input" placeholder="Category (e.g., Food)" required>
+        <textarea name="note" class="form-control mb-2 custom-input" placeholder="Note (optional)" rows="2"></textarea>
+        <button class="btn btn-lav w-100">Add Expense</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="card shadow-sm p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Spending by Category</h6>
+        <small class="text-muted">Updated live</small>
+      </div>
+      <canvas id="categoryChart" height="120"></canvas>
+    </div>
+
+    <div class="card shadow-sm p-3 mb-3">
+      <h6 class="mb-2">Monthly Trend</h6>
+      <canvas id="monthlyChart" height="100"></canvas>
+    </div>
+
+    <div class="card shadow-sm p-3">
+      <h6 class="mb-2">Recent expenses</h6>
+      <div class="table-responsive">
+        <table class="table table-borderless align-middle">
+          <thead>
+            <tr class="text-muted small">
+              <th>Title</th>
+              <th>Category</th>
+              <th>Date</th>
+              <th class="text-end">Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in expenses %}
+            <tr class="align-middle">
+              <td>{{ e.title }}</td>
+              <td>{{ e.category }}</td>
+              <td>{{ e.date.strftime('%Y-%m-%d') }}</td>
+              <td class="text-end">₹ {{ '%.2f'|format(e.amount) }}</td>
+              <td class="text-end">
+                <form method="POST" action="{{ url_for('delete_expense', expense_id=e.id) }}" onsubmit="return confirm('Delete this?');">
+                  <button class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-muted small">No expenses yet</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+async function loadCharts(){
+  const res = await fetch('{{ url_for("chart_data") }}');
+  const data = await res.json();
+
+  // Category chart
+  const catLabels = data.by_category.map(x => x.category);
+  const catAmounts = data.by_category.map(x => x.amount);
+  const ctx1 = document.getElementById('categoryChart').getContext('2d');
+  new Chart(ctx1, {
+    type: 'doughnut',
+    data: {
+      labels: catLabels,
+      datasets: [{ data: catAmounts, backgroundColor: [
+        '#B19CD9','#C8A2C8','#E6CFE6','#D8B0EB','#A59AD6'
+      ] }]
+    },
+    options: {plugins:{legend:{position:'bottom'}}}
+  });
+
+  // Monthly chart
+  const months = data.monthly.map(x => x.month);
+  const monthAmounts = data.monthly.map(x => x.amount);
+  const ctx2 = document.getElementById('monthlyChart').getContext('2d');
+  new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'Monthly spend',
+        data: monthAmounts,
+        fill: true,
+        tension: 0.35,
+        backgroundColor: 'rgba(178,153,218,0.18)',
+        borderColor: '#a58adf',
+        pointBackgroundColor: '#fff'
+      }]
+    },
+    options: {scales:{y:{beginAtZero:true}}}
+  });
+}
+
+document.addEventListener('DOMContentLoaded', loadCharts);
+</script>
+{% endblock %}

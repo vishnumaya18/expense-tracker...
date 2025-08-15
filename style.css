@@ -1,0 +1,58 @@
+:root{
+  --lav-100: #F6F3FB;
+  --lav-200: #EEE8F8;
+  --lav-300: #E1D7F4;
+  --lav-400: #C8B4EC;
+  --lav-500: #A58ADF;
+  --muted: #6b6272;
+}
+
+body.lavender-bg{
+  background: linear-gradient(180deg, var(--lav-100), #fbf8fe);
+  min-height:100vh;
+  color:var(--muted);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.lavender-nav{
+  background: transparent;
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(165,138,223,0.12);
+}
+
+.auth-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(246,241,251,0.7));
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.btn-lav{
+  background: linear-gradient(90deg, var(--lav-400), var(--lav-500));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 6px 18px rgba(165,138,223,0.12);
+  font-weight:600;
+}
+
+.btn-lav:hover{ filter: brightness(0.95); }
+
+.custom-input{
+  background: transparent;
+  border: 1px solid rgba(165,138,223,0.18);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.summary-card{
+  background: linear-gradient(135deg, rgba(165,138,223,0.12), rgba(241,237,252,0.6));
+  border-radius: 14px;
+}
+
+.card{
+  border-radius: 12px;
+}
+
+/* small styling */
+.table td, .table th { border-top: none; }
